@@ -41,53 +41,37 @@ Provisioning using Terraform and Ansible
 1. **Connect to your EC2 instance:** Use your preferred SSH client to connect to your EC2 instance. You'll need the public IP address and username for this.
 2. **Update system packages (if applicable):** This step might vary depending on your Linux distribution on the EC2 instance. Here's an example for Amazon Linux:
 
-\~~~
-
+~~~
 sudo yum update –y
+~~~
 
-\~~~
+3. **Install package manager (if needed):** Some Linux distributions might require installing a package manager to add repositories. Here's an example for Amazon Linux if you don't already have it:
 
-1. **Install package manager (if needed):** Some Linux distributions might require installing a package manager to add repositories. Here's an example for Amazon Linux if you don't already have it:
-
-\~~~
-
+~~~
 sudo yum install -y yum-utils
+~~~
 
-\~~~
-
-1. **Add HashiCorp repository:** Use the appropriate command based on your Linux distribution to add the official HashiCorp repository for Terraform packages.
+4. **Add HashiCorp repository:** Use the appropriate command based on your Linux distribution to add the official HashiCorp repository for Terraform packages.
 
 Amazon Linux:
-
-\~~~
-
+~~~
 sudo yum-config-manager --add-repo <https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo>
+~~~
 
-\~~~
-
-1. **Update package list:** Refresh the package list to include the newly added HashiCorp repository.
-
-\~~~
-
+5. **Update package list:** Refresh the package list to include the newly added HashiCorp repository.
+~~~
 sudo yum update –y
+~~~
 
-\~~~
-
-1. **Install Terraform:** Finally, install Terraform using the package manager.
-
-\~~~
-
+6. **Install Terraform:** Finally, install Terraform using the package manager.
+~~~
 sudo yum install terraform –y
+~~~
 
-\~~~
-
-1. **Verify installation:** Check if Terraform is installed correctly by running the following command:
-
-\~~~
-
+7. **Verify installation:** Check if Terraform is installed correctly by running the following command:
+~~~
 terraform –version
-
-\~~~
+~~~
 
 This should display the installed Terraform version.
 
@@ -100,40 +84,28 @@ There are two main methods to install Ansible:
 **Method A: Using the official package repository (recommended):**
 
 - **Ubuntu/Debian:**
-
-\~~~
-
+~~~
 sudo apt install -y ansible
-
-\~~~
+~~~
 
 - **Amazon Linux:**
-
-\~~~
-
+~~~
 sudo yum install -y ansible
-
-\~~~
+~~~
 
 **Method B: Using pip (package installer for Python):**
 
 This method might require installing Python and python-pip first if they are not already available. Refer to your distribution's documentation for details on installing Python and pip.
 
 Once Python and pip are installed, use the following command:
-
-\~~~
-
+~~~
 sudo pip install ansible
-
-\~~~
+~~~
 
 **Verify installation:** Check if Ansible is installed correctly by running the following command:
-
-\~~~
-
+~~~
 ansible –version
-
-\~~~
+~~~
 
 This should display the installed Ansible version.
 
@@ -142,16 +114,11 @@ This should display the installed Ansible version.
 \* We need to tell Terraform how to interact with your AWS account. There are a few ways to do this, but we'll use environment variables for simplicity.
 
 \* Open your terminal and set the following environment variables:
-
-\~~~
-
-export AWS_ACCESS_KEY_ID="your_access_key_id"
-
-export AWS_SECRET_ACCESS_KEY="your_secret_access_key"
-
-export AWS_DEFAULT_REGION="us-east-1" # Update with your desired region
-
-\~~~
+~~~
+        export AWS_ACCESS_KEY_ID="your_access_key_id"
+        export AWS_SECRET_ACCESS_KEY="your_secret_access_key"
+        export AWS_DEFAULT_REGION="us-east-1"  # Update with your desired region
+~~~
 
 \* Replace \`your_access_key_id\` and \`your_secret_access_key\` with your actual credentials from your AWS account (you can find them in the IAM console).
 
@@ -163,7 +130,7 @@ export AWS_DEFAULT_REGION="us-east-1" # Update with your desired region
 
 Terraform
 
-\~~~
+~~~
 
 \# Configure AWS Provider
 
@@ -247,51 +214,36 @@ from_port = 0
 
 to_port = 0
 
-\~~~
+~~~
 
 Now go to the command prompt and type
-
-\~~~
-
+~~~
 terraform init
-
-\~~~
+~~~
 
 It installs aws terraform plugins from hashicorp.
-
-\~~~
-
+~~~
 terraform fmt
-
-\~~~
+~~~
 
 Command is used to format your configuration files into a canonical format and style according to the syntax**.**
-
-\~~~
-
+~~~
 terraform validate
-
-\~~~
+~~~
 
 Command validates the syntax.
 
 Now run
-
-\~~~
-
+~~~
 terraform plan
-
-\~~~
-
+~~~
 command for dry run, that is simulation.
 
+
 After success now finally run the command
-
-\~~~
-
+~~~
 terraform apply
-
-\~~~
+~~~
 
 to create the resources.
 
@@ -304,43 +256,30 @@ Now that you have Terraform set up to provision your infrastructure, let's creat
 - Inside your project directory (aws-infra), create another file named playbook.yml using a text editor.
 - Paste the following content into playbook.yml:
 
-YAML
+~~~
+---
+- name: Configure Web Server
+  hosts: all
+  become: true  # Allow Ansible to run commands with elevated privileges
 
-\~~~
+  tasks:
+    # Update and upgrade packages (replace 'yum' with 'apt' for Ubuntu)
+    - name: Update package lists
+      yum: update_cache=yes
 
-\---
+    - name: Upgrade packages
+      yum: upgrade=yes
 
-\- name: Configure Web Server
+    # Install a web server (e.g., Apache)
+    - name: Install Apache web server
+      yum: name=apache2 state=present
 
-hosts: all
+    # Ensure service is running
+    - name: Start Apache service
+      service: name=apache2 state=started enabled=yes
 
-become: true # Allow Ansible to run commands with elevated privileges
+~~~
 
-tasks:
-
-\# Update and upgrade packages (replace 'apt' with 'yum' for RedHat/CentOS)
-
-\- name: Update package lists
-
-apt: update_cache=yes
-
-\- name: Upgrade packages
-
-apt: upgrade=yes
-
-\# Install a web server (e.g., Apache)
-
-\- name: Install Apache web server
-
-apt: name=apache2 state=present
-
-\# Ensure service is running
-
-\- name: Start Apache service
-
-service: name=apache2 state=started enabled=yes
-
-\~~~
 
 **Explanation of the Playbook:**
 
@@ -361,33 +300,24 @@ Terraform can provide information about the provisioned resources (like the publ
 
 1. **Run Terraform:** Open your terminal, navigate to your project directory, and run terraform init followed by terraform apply to initialize and apply the Terraform configuration. This will create the infrastructure resources on AWS.
 2. **Inventory File (Optional):** While hosts: all works for a single instance, for multiple instances, create a file named inventory in your project directory. Add the public IP address of your EC2 instance retrieved from Terraform output (you can use terraform output public_ip to view the output).
-
-\~~~
-
-\[webservers\]
-
+~~~
+[webservers]
 your_public_ip_address
-
-\~~~
+~~~
 
 1. **Ansible Playbook Update:** Modify the hosts section in your playbook.yml to use the inventory file:
 
 YAML
+~~~
+- name: Configure Web Server
+  hosts: webservers  # Use the inventory file name
+  become: true
+  # ... rest of the playbook tasks ...
+~~~
 
-\~~~
-
-\- name: Configure Web Server
-
-hosts: webservers # Use the inventory file name
-
-become: true
-
-\# ... rest of the playbook tasks ...
-
-\~~~
 
 1. **Run Ansible Playbook:** With Terraform resources provisioned and the inventory file set up, navigate to your project directory and run
-
+~~~
 ansible-playbook playbook.yml
-
+~~~
 to execute the Ansible playbook and configure your web server on the EC2 instance.
