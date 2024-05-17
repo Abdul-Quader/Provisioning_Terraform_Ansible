@@ -131,90 +131,60 @@ This should display the installed Ansible version.
 Terraform
 
 ~~~
-
-\# Configure AWS Provider
-
+# Configure AWS Provider
 provider "aws" {
-
-region = var.aws_region # Use the variable for region
-
+  region = var.aws_region  # Use the variable for region
 }
 
-\# Define Variables (Optional, but good practice)
-
+# Define Variables (Optional, but good practice)
 variable "aws_region" {
-
-default = "ap-south-1"
-
+  default = "ap-south-1"
 }
 
-\# Create a Virtual Private Cloud (VPC)
-
+# Create a Virtual Private Cloud (VPC)
 resource "aws_vpc" "my_vpc" {
-
-cidr_block = "10.0.0.0/16"
-
+  cidr_block = "10.0.0.0/16"
 }
 
-\# Create a public subnet
-
+# Create a public subnet
 resource "aws_subnet" "public_subnet" {
-
-vpc_id = aws_vpc.my_vpc.id
-
-cidr_block = "10.0.1.0/24"
-
-availability_zone = " ap-south-1a" # Update with your desired zone
-
+  vpc_id            = aws_vpc.my_vpc.id
+  cidr_block         = "10.0.1.0/24"
+  availability_zone = " ap-south-1a"  # Update with your desired zone
 }
 
-\# Create an Internet Gateway
-
+# Create an Internet Gateway
 resource "aws_internet_gateway" "gateway" {
-
-vpc_id = aws_vpc.my_vpc.id
-
+  vpc_id = aws_vpc.my_vpc.id
 }
 
-\# Attach the internet gateway to the VPC
-
+# Attach the internet gateway to the VPC
 resource "aws_vpc_endpoint" "internet" {
-
-vpc_id = aws_vpc.my_vpc.id
-
-service_name = "aws-internet-gateway"
-
-route_table_ids = \[aws_internet_gateway.gateway.route_table_id\]
-
+  vpc_id          = aws_vpc.my_vpc.id
+  service_name    = "aws-internet-gateway"
+  route_table_ids = [aws_internet_gateway.gateway.route_table_id]
 }
 
-\# Create a security group allowing SSH access
 
+# Create a security group allowing SSH access
 resource "aws_security_group" "ssh_access" {
+  name = "ssh_access"
+  description = "Allow SSH access"
 
-name = "ssh_access"
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Update for specific IP range if desired
+  }
 
-description = "Allow SSH access"
-
-ingress {
-
-from_port = 22
-
-to_port = 22
-
-protocol = "tcp"
-
-cidr_blocks = \["0.0.0.0/0"\] # Update for specific IP range if desired
-
+  egress {
+    from_port = 0
+    to_port   = 0
+ }
 }
-
-egress {
-
-from_port = 0
-
-to_port = 0
-
 ~~~
+
 
 Now go to the command prompt and type
 ~~~
