@@ -117,7 +117,7 @@ This should display the installed Ansible version.
 ~~~
         export AWS_ACCESS_KEY_ID="your_access_key_id"
         export AWS_SECRET_ACCESS_KEY="your_secret_access_key"
-        export AWS_DEFAULT_REGION="us-east-1"  # Update with your desired region
+        export AWS_DEFAULT_REGION="ap-south-1"  # Update with your desired region
 ~~~
 
 \* Replace \`your_access_key_id\` and \`your_secret_access_key\` with your actual credentials from your AWS account (you can find them in the IAM console).
