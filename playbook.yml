@@ -1,0 +1,20 @@
+---
+- name: Configure Web Server
+  hosts: webservers    #as specified in the inventory file
+  become: true  # Allow Ansible to run commands with elevated(root) privileges
+
+  tasks:
+    # Update and upgrade packages (replace 'apt' with 'yum' for RedHat/CentOS)
+    - name: Update package lists
+      apt: update_cache=yes
+
+    - name: Upgrade packages
+      apt: upgrade=yes
+
+    # Install a web server (e.g., Apache)
+    - name: Install Apache web server
+      apt: name=apache2 state=present
+
+    # Ensure service is running
+    - name: Start Apache service
+      service: name=apache2 state=started enabled=yes
